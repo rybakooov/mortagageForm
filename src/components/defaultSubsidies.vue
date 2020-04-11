@@ -1,13 +1,14 @@
 <template>
   <div class="subsidies">
     <div class="subsidies-block" :class="'subsidies-block_' + subs.width" :key="subs.subsidiesTitle" v-for="subs in subsidies">
+
       <label class="subsidies-block-label">
         <input @change="cleanDops(subs)" :id="subs.subsidiesID" type="checkbox" v-model="subs.notDisabled">
         <div class="custom-checkbox"></div>
         {{subs.subsidiesTitle}}  
       </label>
       <div class="subsidies-block-inside" :class="{'subsidies-block-inside_active': subs.notDisabled}">
-        <defaultInput :disabled="subs.notDisabled" :inputData="input" v-for="input in subs.inputs" :key="input.inputName"/>
+        <defaultInput :disabled="!subs.notDisabled" :inputData="input" v-for="input in subs.inputs" :key="input.inputName"/>
       </div>
     </div>
   </div>
@@ -20,11 +21,18 @@ export default {
   components: {
     defaultInput
   }, 
+  props: [
+    'subsidies',
+  ],
   methods: {
     cleanDops(item) {
       for(let subs in this.subsidies){
-        if (this.subsidies[subs].subsidiesID == item.subsidiesID) continue;
-        this.subsidies[subs].notDisabled = false
+        if (this.subsidies[subs].subsidiesID == item.subsidiesID){
+          continue;
+        } else {
+          this.subsidies[subs].notDisabled = false;
+        }
+        
       }
     },
   },
@@ -33,100 +41,6 @@ export default {
   },
   data: function () {
     return {
-      subsidies: {
-        maternalSub: {
-          subsidiesID: 1,
-          width: '100',
-          subsidiesTitle: 'Материнский капитал',
-          notDisabled: false,
-          inputs: {
-            maternalSum: {
-              inputName: 'maternalSum',
-              inputTitle: 'Размер материнского капитала',
-              inputValue: '',
-              inputPlaceholder: '0',
-              inputWidth: 'oneThird',
-              inputType: 'number',
-              filter: 'localeRU',
-            },
-            howToUse: {
-              inputName: 'howToUse',
-              inputTitle: 'Использовать как',
-              inputValue: 'Досрочное погашение по кредиту',
-              inputWidth: 'oneThird',
-              inputType: 'select',
-              inputSelectCond: false,
-              inputSelectOptions: [
-                'Досрочное погашение по кредиту',
-                'Первоначальный взнос',
-              ]
-            },
-            maternalProc: {
-              inputName: 'maternalProc',
-              inputTitle: 'В процентах',
-              inputValue: '',
-              inputPlaceholder: '0',
-              inputWidth: 'oneThird',
-              inputType: 'text',
-              filter: 'localeRU',
-            },
-          }
-        },
-        simplySub: {
-          width: 'half',
-          subsidiesID: 2,
-          notDisabled: false,
-          subsidiesTitle: 'Субсидия',
-          inputs: {
-            simplySum: {
-              inputName: 'simplySum',
-              inputTitle: 'Размер субсидии',
-              inputValue: '',
-              inputPlaceholder: '0',
-              inputWidth: 'half',
-              inputType: 'number',
-              filter: 'localeRU',
-            },
-            subsidyType: {
-              inputName: 'subsidyType',
-              inputTitle: 'Вид субсидии',
-              inputValue: 'Соц сос',
-              inputWidth: 'half',
-              inputType: 'select',
-              inputSelectCond: false,
-              inputSelectOptions: [
-                'Соц сос',
-                'Соц сос 2',
-              ]
-            },
-          }
-        },
-        militarySub: {
-          width: 'half',
-          subsidiesID: 3,
-          notDisabled: false,
-          subsidiesTitle: 'Военная ипотека',
-          inputs: {
-            militarySum: {
-              inputName: 'militarySum',
-              inputTitle: 'Размер НИС',
-              inputValue: '',
-              inputPlaceholder: '0',
-              inputWidth: 'half',
-              inputType: 'number',
-              filter: 'localeRU',
-            },
-            militaryDate: {
-              inputName: 'militaryDate',
-              inputTitle: 'Дата выдачи НИС',
-              inputPlaceholder: '01.01.2000',
-              inputValue: '',
-              inputWidth: 'half',
-              inputType: 'date',
-            },
-          }
-        },
-      }
     }
   }
 }

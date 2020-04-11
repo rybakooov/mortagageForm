@@ -35,6 +35,7 @@ export default {
     return {
       infoStage: {
         mortWrapName: 'Паспорт',
+        mortWrapID: 'passport',
         mortWrapSolo: true,
       }
     }

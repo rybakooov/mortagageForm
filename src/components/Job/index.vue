@@ -5,6 +5,7 @@
 <script>
 
 import defaultStage from '@/components/defaultStage.vue'
+import mask from '@/JSModules/mask.js'
 
 export default {
   components: {
@@ -17,9 +18,9 @@ export default {
     'infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.registrationIsFactResidence.inputValue': {
       handler: function (newVal) {
         if(newVal == 'Да') {
-          this.infoStage.mortWrapDopsBlocks.factAdress.userFactResidence = false;
+          this.infoStage.mortWrapDopsBlocks.factAdress.visible = false;
         } else {
-          this.infoStage.mortWrapDopsBlocks.factAdress.userFactResidence = true;
+          this.infoStage.mortWrapDopsBlocks.factAdress.visible = true;
         }
       }
     }
@@ -29,6 +30,7 @@ export default {
       infoStage: {
         mortWrapName: 'Сведения о работе',
         mortWrapActive: false,
+        mortWrapID: 'job',
         mortWrapJobs: {
           job1: {
             jobTitle: 'Основное место работы'
@@ -45,7 +47,9 @@ export default {
             inputPos: 'solo',
             inputSelectOptions: [
               'Работник по найму',
-              'Работник по найму 2',
+              'Собственник бизнеса',
+              'ИП',
+              'Другое',
             ]
           },
           jobName: {
@@ -63,12 +67,14 @@ export default {
             inputValue: '',
             inputWidth: 'quarter',
             inputType: 'number',
+            mask: mask.inn,
           },
           phone: {
             inputName: 'phone',
             inputTitle: 'Телефон',
             inputPlaceholder: '+7 (999) 999-99-99',
             inputValue: '',
+            mask: mask.phone,
             inputWidth: 'quarter',
             inputType: 'phone',
           },
@@ -87,7 +93,7 @@ export default {
             mortWrapInputs: {
               registrationIsFactResidence: {
                 inputName: 'registrationIsFactResidence',
-                inputTitle: 'Адрес фактического проживания совпадает с адресом регистрации?',
+                inputTitle: 'Юридический адрес совпадает с фактическим?',
                 inputValue: 'Нет',
                 inputWidth: 'half',
                 inputPos: 'solo',
@@ -103,6 +109,7 @@ export default {
                 inputTitle: 'Индекс',
                 inputPlaceholder: '197198',
                 inputValue: '',
+                mask: mask.index,
                 inputWidth: 'quarter',
                 inputType: 'number',
               },
@@ -158,13 +165,14 @@ export default {
           },
           factAdress: {
             subTitle: 'Фактический адрес адрес',
-            userFactResidence: true,
+            visible: true,
             mortWrapInputs: {
               indexHouse: {
                 inputName: 'indexHouse',
                 inputTitle: 'Индекс',
                 inputPlaceholder: '197198',
                 inputValue: '',
+                mask: mask.index,
                 inputWidth: 'quarter',
                 inputType: 'number',
               },
@@ -230,7 +238,24 @@ export default {
                 inputSelectCond: false,
                 inputSelectOptions: [
                   'Финансы / Банки / Страхование',
-                  'Финансы / Банки / Страхование 2',
+                  'Правоохранительные органы',
+                  'Образование',
+                  'Сельское хозяйство',
+                  'Культура и искусство',
+                  'Охранная деятельность',
+                  'Органы власти и управления',
+                  'Информационные технологии',
+                  'Оптовая и розничная торговля',
+                  'Медицина',
+                  'Производство',
+                  'Транспорт',
+                  'Промышленность',
+                  'Юриспруденция',
+                  'Строительство',
+                  'Наука',
+                  'Услуги',
+                  'Туризм',
+                  'Иное',
                 ]
               },
               size: {
@@ -242,22 +267,25 @@ export default {
                 inputSelectCond: false,
                 inputSelectOptions: [
                   'До 10',
-                  'от 10 до 50',
-                  'от 50 до 100',
+                  '11-30',
+                  '31-50',
+                  '51-100',
+                  '101-500',
+                  '501-1000',
+                  'более 1000',
                 ]
               },
               termOfExistence: {
                 inputName: 'termOfExistence',
                 inputTitle: 'Срок существования организации',
-                inputValue: 'До 1 года',
+                inputValue: 'до 2-х лет',
                 inputWidth: 'oneThird',
                 inputType: 'select',
                 inputSelectCond: false,
                 inputSelectOptions: [
-                  'До 1 года',
-                  'До 3 лет',
-                  'До 5 лет',
-                  'До 10 лет',
+                  'до 2-х лет',
+                  'от 2-5 лет',
+                  'более 5 лет',
                 ]
               },
 
@@ -273,23 +301,24 @@ export default {
                 inputName: 'withoutConfirm',
                 inputTitle: 'Подтверждение дохода',
                 inputWidth: 'oneThird',
-                inputValue: 'Без подтверждения дохода - по двум...',
+                inputValue: '2-НДФЛ',
                 inputType: 'select',
                 inputSelectCond: false,
                 inputSelectOptions: [
-                  'Без подтверждения дохода - по двум...',
-                  'Без подтверждения дохода - по двум... 2',
-                  'Без подтверждения дохода - по двум... 3',
-                  'Без подтверждения дохода - по двум... 4',
+                  '2-НДФЛ',
+                  'Справка по форме банка',
+                  'Без подтверждения дохода - по двум документам',
                 ]
               },
               income: {
                 inputName: 'income',
                 inputTitle: 'Среднемесячный доход',
-                inputPlaceholder: '0',
+                inputPlaceholder: '0 Руб',
                 inputValue: '',
                 inputWidth: 'oneThird',
                 inputType: 'number',
+                postfix: ' Руб',
+                mask: mask.rub,
               },
             },
             checkboxBlock: {
@@ -311,11 +340,12 @@ export default {
               dopIncome: {
                 inputName: 'dopIncome',
                 inputTitle: 'Дополнительный доход',
-                inputPlaceholder: '0',
+                inputPlaceholder: '0 Руб',
                 inputValue: '',
                 inputWidth: 'oneThird',
                 inputType: 'number',
-                filter: 'localeRU',
+                postfix: ' Руб',
+                mask: mask.rub,
               },
               sourseIncome: {
                 inputName: 'sourseIncome',

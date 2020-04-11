@@ -14,6 +14,7 @@ export default {
     return {
       infoStage: {
         mortWrapName: 'Дополнительная информация',
+        mortWrapID: 'dopInfo',
         mortWrapInputs: {
           comment: {
             inputName: 'comment',

@@ -41,6 +41,36 @@ export default {
     OtherInfo,
     Passport,
     Signature,
+  },
+  data: function() {
+    return {
+      userID: 0,
+    }
+  },
+  mounted: function(){
+    
+  },
+  watch: {
+    '$store.state.openedStage': {
+      handler: function(e) {
+        if (this.$store.state.openedStage != false){
+          setTimeout(()=>{
+            var scrolllll = document.getElementById(`${e}`).getBoundingClientRect().top - 50;
+            window.scrollBy({
+              top: scrolllll,
+              left: 0,
+              behavior: 'smooth'
+            });
+          }, 200)
+        } else if (this.$store.state.openedStage == false) {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }
   }
 }
 </script>

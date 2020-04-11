@@ -5,6 +5,7 @@
 <script>
 
 import defaultStage from '@/components/defaultStage.vue'
+import mask from '@/JSModules/mask.js'
 
 export default {
   components: {
@@ -17,9 +18,9 @@ export default {
     'infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.registrationIsFactResidence.inputValue': {
       handler: function (newVal) {
         if(newVal == 'Да') {
-          this.infoStage.mortWrapDopsBlocks.userFactResidence.userFactResidence = false;
+          this.infoStage.mortWrapDopsBlocks.userFactResidence.visible = false;
         } else {
-          this.infoStage.mortWrapDopsBlocks.userFactResidence.userFactResidence = true;
+          this.infoStage.mortWrapDopsBlocks.userFactResidence.visible = true;
         }
       }
     }
@@ -28,6 +29,7 @@ export default {
     return {
       infoStage: {
         mortWrapName: 'Личная информация',
+        mortWrapID: 'persInfo', 
         mortWrapInputs: {
           userSecondName: {
             inputName: 'userSecondName',
@@ -36,6 +38,10 @@ export default {
             inputPlaceholder: 'Иванов',
             inputWidth: 'oneThird',
             inputType: 'text',
+            inputValidate: {
+              required: true,
+              minLength: 2,
+            }
           },
           userFirstName: {
             inputName: 'userFirstName',
@@ -44,6 +50,8 @@ export default {
             inputPlaceholder: 'Иван',
             inputWidth: 'oneThird',
             inputType: 'text',
+            inputValidate: {
+            }
           },
           userPatronymicName: {
             inputName: 'userPatronymicName',
@@ -52,6 +60,8 @@ export default {
             inputPlaceholder: 'Иванович',
             inputWidth: 'oneThird',
             inputType: 'text',
+            inputValidate: {
+            }
           },
           userPlaceOfBirth: {
             inputName: 'userPlaceOfBirth',
@@ -60,6 +70,8 @@ export default {
             inputPlaceholder: 'Иваново',
             inputWidth: 'oneThird',
             inputType: 'text',
+            inputValidate: {
+            }
           },
           userDateOfBirth: {
             inputName: 'userDateOfBirth',
@@ -68,6 +80,9 @@ export default {
             inputPlaceholder: '10.10.1999',
             inputWidth: 'oneThird',
             inputType: 'date',
+            mask: mask.date,
+            inputValidate: {
+            }
           },
           userSex: {
             inputName: 'userSex',
@@ -92,7 +107,9 @@ export default {
                 inputValue: '',
                 inputWidth: 'oneThird',
                 inputType: 'text',
-                inputPos: 'solo'
+                inputPos: 'solo',
+                inputValidate: {
+                }
               },
               series: {
                 inputName: 'series',
@@ -101,6 +118,9 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.passSeria,
+                inputValidate: {
+                }
               },
               number: {
                 inputName: 'number',
@@ -109,6 +129,9 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.passNumber,
+                inputValidate: {
+                }
               },
               divisionСode: {
                 inputName: 'divisionСode',
@@ -117,6 +140,9 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.passCode,
+                inputValidate: {
+                }
               },
               dateOfIssue: {
                 inputName: 'dateOfIssue',
@@ -125,6 +151,9 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'date',
+                mask: mask.date,
+                inputValidate: {
+                }
               },
               whoIssued: {
                 inputName: 'whoIssued',
@@ -141,14 +170,20 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.inn,
+                inputValidate: {
+                }
               },
               snils: {
-                inputName: 'dateOfIssue',
+                inputName: 'snils',
                 inputTitle: 'Снилс',
-                inputPlaceholder: '123456789012',
+                inputPlaceholder: '000-000-000 00',
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.snils,
+                inputValidate: {
+                }
               },
             },
           },
@@ -163,7 +198,9 @@ export default {
                 inputSelectCond: false,
                 inputSelectOptions: [
                   'Среднее / неполное среднее',
-                  'Среднее / неполное среднее 2',
+                  'Cреднее специальное',
+                  'Незаконченное высшее',
+                  'Высшее',
                 ]
               },
               institution: {
@@ -177,13 +214,16 @@ export default {
               status: {
                 inputName: 'status',
                 inputTitle: 'Семейное положения',
-                inputValue: 'Холост / Не замужем',
+                inputValue: 'Женат / Замужем',
                 inputWidth: 'quarter',
                 inputType: 'select',
                 inputSelectCond: false,
                 inputSelectOptions: [
+                  'Женат / Замужем',
+                  'Гражданский брак',
                   'Холост / Не замужем',
-                  'Холост / Не замужем 2',
+                  'В разводе',
+                  'Вдовец / Вдова',
                 ]
               },
               kids: {
@@ -214,13 +254,16 @@ export default {
               typeOfHouse: {
                 inputName: 'typeOfHouse',
                 inputTitle: 'Вид жилья',
-                inputValue: 'Жилье родственников',
+                inputValue: 'Собственное жилье',
                 inputWidth: 'quarter',
                 inputType: 'select',
                 inputSelectCond: false,
                 inputSelectOptions: [
+                  'Собственное жилье',
                   'Жилье родственников',
-                  'Жилье мое',
+                  'Социальный найм',
+                  'Аренда',
+                  'Другое',
                 ]
               },
               registrationIsFactResidence: {
@@ -244,6 +287,7 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.index,
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -252,6 +296,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               cityHouse: {
                 inputName: 'cityHouse',
@@ -260,6 +306,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               streetHouse: {
                 inputName: 'streetHouse',
@@ -268,6 +316,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'half',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               numHouse: {
                 inputName: 'numHouse',
@@ -276,6 +326,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               corpusHouse: {
                 inputName: 'corpusHouse',
@@ -292,6 +344,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               
               /* copy down end */
@@ -299,22 +353,26 @@ export default {
           },
           userFactResidence: {
             subTitle: 'Адрес фактического проживания',
-            userFactResidence: true,
+            visible: true,
             mortWrapInputs: {
               
               typeOfHouse: {
-                inputName: 'typeOfHouse',
+                inputName: 'typeOfHouseFact',
                 inputTitle: 'Вид жилья',
-                inputValue: 'Жилье родственников',
+                inputValue: 'Собственное жилье',
                 inputWidth: 'quarter',
                 inputType: 'select',
                 inputPos: 'solo',
                 inputSelectCond: false,
                 inputSelectOptions: [
+                  'Собственное жилье',
                   'Жилье родственников',
-                  'Жилье мое',
+                  'Социальный найм',
+                  'Аренда',
+                  'Другое',
                 ]
               },
+              /* copy down */
               indexHouse: {
                 inputName: 'indexHouse',
                 inputTitle: 'Индекс',
@@ -322,6 +380,7 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.index,
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -330,6 +389,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               cityHouse: {
                 inputName: 'cityHouse',
@@ -338,6 +399,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               streetHouse: {
                 inputName: 'streetHouse',
@@ -346,6 +409,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'half',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               numHouse: {
                 inputName: 'numHouse',
@@ -354,6 +419,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               corpusHouse: {
                 inputName: 'corpusHouse',
@@ -370,6 +437,8 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
               
             }

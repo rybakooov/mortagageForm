@@ -28,6 +28,7 @@ export default {
       infoStage: {
         mortWrapName: 'Подпись',
         mortWrapSolo: true,
+        mortWrapID: 'sign',
       }
     }
   }

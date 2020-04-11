@@ -1,19 +1,19 @@
 <template>
-  <div class="mortWrap">
+  <div class="mortWrap" :id="stageInfo.mortWrapID">
     <!-- FIRST LEVEL -->
     <div class="mortWrap-block">
       
       <!-- TITLEBLOCK -->
-      <div @click="showBlocks = !showBlocks" class="mortWrap__titleBlock">
+      <div @click="openPlz" class="mortWrap__titleBlock">
         {{ stageInfo.mortWrapName }}
-        <svg :class="{'rotate': showBlocks}" width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg :class="{'rotate': isOpen}" width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 1L9 9L17 1" stroke="#FD7800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <!-- TITLEBLOCK END -->
 
       <!-- PASSPORT AND SIGNATURE -->
-      <div v-if="showBlocks && stageInfo.mortWrapSolo" class="mortWrap-block-inside">
+      <div v-if="isOpen && stageInfo.mortWrapSolo" class="mortWrap-block-inside">
         <slot name="Passport"></slot>
         <slot name="Signature"></slot>
       </div>
@@ -21,7 +21,7 @@
       <!-- PASSPORT AND SIGNATURE END -->
 
 
-      <div v-if="showBlocks && stageInfo.mortWrapInputs" class="mortWrap-block-inside">
+      <div v-if="isOpen && stageInfo.mortWrapInputs" class="mortWrap-block-inside">
 
         <!-- JOB TABS -->
         <div v-if="stageInfo.mortWrapJobs" class="job-tabs">
@@ -44,7 +44,7 @@
 
         <!-- SUBSIDIES -->
         <div v-if="stageInfo.mortWrapName == 'Условия кредитования'">
-          <defaultSubsidies/>
+          <defaultSubsidies :subsidies="subs"/>
         </div>
         <!-- SUBSIDIES END -->
       </div>
@@ -53,8 +53,8 @@
 
 
     <!-- SECOND LEVEL -->
-    <div v-if="showBlocks">
-      <div :key="Object.keys(block)[0]" v-for="block in stageInfo.mortWrapDopsBlocks" class="mortWrap-block">
+    <div v-if="isOpen">
+      <div :key="index" v-for="(block, index) in sortList" class="mortWrap-block">
         <div class="mortWrap-block-inside">
 
 
@@ -90,8 +90,8 @@
 
 
     <!-- ASSETS AND HISTORY -->
-    <slot v-if="showBlocks" name="Asset"></slot>
-    <slot v-if="showBlocks" name="AssetAdd"></slot>
+    <slot v-if="isOpen" name="Asset"></slot>
+    <slot v-if="isOpen" name="AssetAdd"></slot>
     <!-- ASSETS AND HISTORY END -->
   </div>
 </template>
@@ -106,15 +106,151 @@ export default {
     defaultInput,
     defaultSubsidies,
   },
-  props: [
-    'stageInfo'
-  ],
-  data: function() {
-    return {
-      showBlocks: false
+  props: {
+    stageInfo: {
+      type: Object,
+    },
+    subs: {
+      type: Object,
+      default: null,
+    },
+  },
+  mounted: function(){
+    this.openedStage = this.$store.state.openedStage;
+    this.insertStage();
+  },
+  methods: {
+    openPlz() {
+
+      /*сохраняем, если закрывается хотя бы один блок */
+      this.saveStage();
+      if(this.$store.state.openedStage == this.stageInfo.mortWrapID) {
+        this.$store.commit('changeOpenedStage', false);
+      } else {
+        this.$store.commit('changeOpenedStage', this.stageInfo.mortWrapID);
+      }
+      /*сохраняем, если закрывается хотя бы один блок end */
+    },
+    saveStage() {
+      let forSave = {};
+      forSave.stageName = this.stageInfo.mortWrapID;
+      forSave.fields = {};
+
+
+      /* сохраняем данные первого уровня */
+      if('mortWrapInputs' in this.stageInfo){
+        forSave.fields.firstInputs = {}
+        for(let firstInputs in this.stageInfo.mortWrapInputs) {
+          forSave.fields.firstInputs[firstInputs] = this.stageInfo.mortWrapInputs[firstInputs].inputValue;
+        }
+      }
+      /* сохраняем данные первого уровня */
+
+
+      /* сохраняем данные по субсидиям */
+      if(this.subs != null){
+        forSave.fields.subsidies = {}
+        for(let sub in this.subs) {
+          forSave.fields.subsidies[sub] = {};
+          forSave.fields.subsidies[sub].notDisabled = this.subs[sub].notDisabled;
+          forSave.fields.subsidies[sub].inputs = {};
+          for(let input in this.subs[sub].inputs){
+            forSave.fields.subsidies[sub].inputs[input] = this.subs[sub].inputs[input].inputValue;
+          }
+        }
+      }
+      /* сохраняем данные по субсидиям */
+
+
+
+
+      /* сохраняем данные по внутренним блокам */
+      if('mortWrapDopsBlocks' in this.stageInfo){
+        forSave.dopsBlocks = {};
+        for(let block in this.stageInfo.mortWrapDopsBlocks) {
+          forSave.dopsBlocks[block] = {};
+          forSave.dopsBlocks[block].name = block;
+          forSave.dopsBlocks[block].fields = {};
+          for(let input in this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs){
+            forSave.dopsBlocks[block].fields[input] = this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[input].inputValue;
+          }
+        }
+      }
+      /* сохраняем данные по внутренним блокам */
+
+
+
+
+      this.$store.commit('saveUserStage', forSave);
+    },
+
+    insertStage() {
+
+      let activeUser = this.$store.getters.getActiveUser;
+      if(activeUser != undefined){
+        let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
+        if(stateOfActiveUser){
+          if(stateOfActiveUser.fields != undefined){
+            for(let field in stateOfActiveUser.fields.firstInputs){
+              // ?    Разобраться какого хуя значение в инпуте без букв хуярит, а при выводе в консоль постфиксы есть
+              // TODO Доработать постфиксы при вставке 
+
+              this.stageInfo.mortWrapInputs[field].inputValue = stateOfActiveUser.fields.firstInputs[field];
+            }
+            if(stateOfActiveUser.fields.subsidies != undefined){
+              for(let sub in stateOfActiveUser.fields.subsidies){
+                this.subs[sub].notDisabled = stateOfActiveUser.fields.subsidies[sub].notDisabled;
+
+                for(let input in stateOfActiveUser.fields.subsidies[sub].inputs){
+                  this.subs[sub].inputs[input].inputValue = stateOfActiveUser.fields.subsidies[sub].inputs[input];
+                }
+              }
+            }
+          }
+          if(stateOfActiveUser.dopsBlocks != undefined){
+            for(let block in stateOfActiveUser.dopsBlocks) {
+              for(let field in stateOfActiveUser.dopsBlocks[block].fields){
+                this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = stateOfActiveUser.dopsBlocks[block].fields[field]
+              }
+            }
+          }
+        }
+      }
     }
   },
   computed: {
+    changeUsersHelper(){
+      return this.$store.getters.getActiveID
+    },
+    sortList() {
+      var sortDopsBlock = {};
+      if(this.stageInfo.mortWrapDopsBlocks != undefined){
+        for (let block in this.stageInfo.mortWrapDopsBlocks) {
+          if('visible' in this.stageInfo.mortWrapDopsBlocks[block] && this.stageInfo.mortWrapDopsBlocks[block].visible == false){
+            continue;
+          } else {
+            sortDopsBlock[block] = this.stageInfo.mortWrapDopsBlocks[block];
+          }
+        }
+      }
+      return sortDopsBlock;
+    },
+    isOpen() {
+      return this.$store.state.openedStage == this.stageInfo.mortWrapID;
+    }
+  },
+  watch: {
+    'changeUsersHelper': {
+      handler: function(){
+        this.insertStage();
+      }
+    },
+  },
+  data: function() {
+    return {
+      showBlocks: false,
+      openedStage: '',
+    }
   },
 }
 
