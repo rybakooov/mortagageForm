@@ -2,7 +2,6 @@
   <div class="mortWrap" :id="stageInfo.mortWrapID">
     <!-- FIRST LEVEL -->
     <div class="mortWrap-block">
-      
       <!-- TITLEBLOCK -->
       <div @click="openPlz" class="mortWrap__titleBlock">
         {{ stageInfo.mortWrapName }}
@@ -24,15 +23,7 @@
       <div v-if="isOpen && stageInfo.mortWrapInputs" class="mortWrap-block-inside">
 
         <!-- JOB TABS -->
-        <div v-if="stageInfo.mortWrapJobs" class="job-tabs">
-          <div class="job-tabs__item" v-for="job in stageInfo.mortWrapJobs" :key="job.jobTitle">{{job.jobTitle}}</div>
-          <div class="job-tabs__item">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 1V6M6 11V6M6 6H11M6 6H1" stroke="#FD7800" stroke-linecap="round"/>
-            </svg>
-            Добавить
-          </div>
-        </div>
+        <slot name="jobTabs"></slot>
         <!-- JOB TABS END -->
 
         <!-- INPUTS FIRST -->
@@ -86,8 +77,7 @@
       </div>
     </div>
     <!-- SECOND LEVEL END -->
-
-
+    
 
     <!-- ASSETS AND HISTORY -->
     <slot v-if="isOpen" name="Asset"></slot>
@@ -134,9 +124,12 @@ export default {
     saveStage() {
       let forSave = {};
       forSave.stageName = this.stageInfo.mortWrapID;
+
+      
+
+
+
       forSave.fields = {};
-
-
       /* сохраняем данные первого уровня */
       if('mortWrapInputs' in this.stageInfo){
         forSave.fields.firstInputs = {}
@@ -180,47 +173,73 @@ export default {
 
 
 
+      //**** JOB ****//
+      if (this.stageInfo.mortWrapID == 'job'){
+        delete forSave.stageName;
+        forSave.id = this.$store.getters.getActiveJob.jobID;
+        this.$store.commit('saveJobStage', forSave);
+        return false
+      }
+      //**** JOB END ****//
+
+
 
       this.$store.commit('saveUserStage', forSave);
     },
 
     insertStage() {
 
-      let activeUser = this.$store.getters.getActiveUser;
-      if(activeUser != undefined){
-        let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
-        if(stateOfActiveUser){
-          if(stateOfActiveUser.fields != undefined){
-            for(let field in stateOfActiveUser.fields.firstInputs){
-              // ?    Разобраться какого хуя значение в инпуте без букв хуярит, а при выводе в консоль постфиксы есть
-              // TODO Доработать постфиксы при вставке 
+      if (this.stageInfo.mortWrapID == 'job'){
+        for(let field in this.$store.getters.getActiveJob.data.firstInputs){
+          this.stageInfo.mortWrapInputs[field].inputValue = this.$store.getters.getActiveJob.data.firstInputs[field];
+        }
 
-              this.stageInfo.mortWrapInputs[field].inputValue = stateOfActiveUser.fields.firstInputs[field];
-            }
-            if(stateOfActiveUser.fields.subsidies != undefined){
-              for(let sub in stateOfActiveUser.fields.subsidies){
-                this.subs[sub].notDisabled = stateOfActiveUser.fields.subsidies[sub].notDisabled;
-
-                for(let input in stateOfActiveUser.fields.subsidies[sub].inputs){
-                  this.subs[sub].inputs[input].inputValue = stateOfActiveUser.fields.subsidies[sub].inputs[input];
-                }
-              }
-            }
+        for(let block in this.$store.getters.getActiveJob.data){
+          if(block == 'firstInputs') continue;
+          for(let field in this.$store.getters.getActiveJob.data[block].fields){
+            this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = this.$store.getters.getActiveJob.data[block].fields[field];
           }
-          if(stateOfActiveUser.dopsBlocks != undefined){
-            for(let block in stateOfActiveUser.dopsBlocks) {
-              for(let field in stateOfActiveUser.dopsBlocks[block].fields){
-                this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = stateOfActiveUser.dopsBlocks[block].fields[field]
+        }
+        return false
+      }
+
+
+      let activeUser = this.$store.getters.getActiveUser;
+      //if(activeUser != undefined){
+      let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
+      if(stateOfActiveUser){
+        if(stateOfActiveUser.fields != undefined){
+          for(let field in stateOfActiveUser.fields.firstInputs){
+            this.stageInfo.mortWrapInputs[field].inputValue = stateOfActiveUser.fields.firstInputs[field];
+          }
+          if(stateOfActiveUser.fields.subsidies != undefined){
+            for(let sub in stateOfActiveUser.fields.subsidies){
+              this.subs[sub].notDisabled = stateOfActiveUser.fields.subsidies[sub].notDisabled;
+
+              for(let input in stateOfActiveUser.fields.subsidies[sub].inputs){
+                this.subs[sub].inputs[input].inputValue = stateOfActiveUser.fields.subsidies[sub].inputs[input];
               }
             }
           }
         }
+        if(stateOfActiveUser.dopsBlocks != undefined){
+          for(let block in stateOfActiveUser.dopsBlocks) {
+            for(let field in stateOfActiveUser.dopsBlocks[block].fields){
+              this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = stateOfActiveUser.dopsBlocks[block].fields[field]
+            }
+          }
+        }
       }
+      //}
     }
   },
   computed: {
     changeUsersHelper(){
       return this.$store.getters.getActiveID
+    },
+    changeJobHelper(){
+      if(this.$store.getters.changeJobHelper == undefined) return 0
+      return this.$store.getters.getActiveJobId;
     },
     sortList() {
       var sortDopsBlock = {};
@@ -245,6 +264,11 @@ export default {
         this.insertStage();
       }
     },
+    'changeJobHelper': {
+      handler: function(){
+        this.insertStage();
+      }
+    }
   },
   data: function() {
     return {
@@ -301,44 +325,6 @@ export default {
           margin: -15px -10px;
           display: flex;
           flex-wrap: wrap;
-        }
-      }
-    }
-  }
-  .job-tabs{
-    display: flex;
-    flex-wrap: wrap;
-    margin: -10px -10px 20px;
-    &__item{
-      margin: 10px;
-      display: flex;
-      align-items: center;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 17px;
-      text-align: center;
-      color: #333333;
-      justify-content: center;
-      width: 185px;
-      height: 60px;
-      background: #FFFFFF;
-      border: 2px solid #FD7800;
-      box-sizing: border-box;
-      border-radius: 5px;
-      &:last-child{
-        svg{
-          margin-right: 10px;
-        }
-        font-size: 14px;
-        line-height: 17px;
-        font-weight: normal;
-        color: #333333;
-        border: 1px solid rgba(51, 51, 51, 0.3);
-        box-sizing: border-box;
-        transition: .3s;
-        cursor: pointer;
-        &:hover{
-          background-color: rgba(253, 120, 0, 0.05);
         }
       }
     }

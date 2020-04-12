@@ -116,7 +116,6 @@ export default {
       this.changed = true;
       if ('inputValidate' in this.inputData){
         if(this.$v.inputData.inputValue.required == false) {
-          console.log(111111);
           this.error = 'Это обязательное поле';
           return false;
         } 

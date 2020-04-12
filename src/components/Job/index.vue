@@ -1,5 +1,28 @@
 <template>
-  <defaultStage :stageInfo="infoStage"/>
+  <defaultStage :stageInfo="infoStage">
+    <template v-slot:jobTabs>
+      <div class="job-tabs">
+        <div 
+        class="job-tabs__item" 
+        v-for="job in getJobs" 
+        :key="job.jobTitle"
+        @click="changeActiveJob(job.jobID)"
+        :class="{'job-tabs__item_active': (job.jobID == activeJob.jobID)}"
+        >
+          {{job.jobTitle}}
+          <svg @click.stop="deleteJob(job.jobID)" class="job-tabs__item__close" width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.07107 1L4.53553 4.53553M4.53553 4.53553L1 8.07107M4.53553 4.53553L8.07107 8.07107M4.53553 4.53553L1 1" stroke="#EB5757" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="job-tabs__item" @click="addJob">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 1V6M6 11V6M6 6H11M6 6H1" stroke="#FD7800" stroke-linecap="round"/>
+          </svg>
+          Добавить
+        </div>
+      </div>
+    </template>
+  </defaultStage>
 </template>
 
 <script>
@@ -12,7 +35,15 @@ export default {
     defaultStage
   },
   methods: {
-
+    addJob(){
+      this.$store.dispatch('createDopJob');
+    },
+    changeActiveJob(n){
+      this.$store.commit('changeActiveJob', n);
+    },
+    deleteJob(n){
+      this.$store.commit('deleteJob', n);
+    },
   },
   watch: {
     'infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.registrationIsFactResidence.inputValue': {
@@ -25,17 +56,23 @@ export default {
       }
     }
   },
+  computed: {
+    getAc(){
+      return this.$store.getters.getActiveJob;
+    },
+    getJobs(){
+      return this.$store.getters.getJobs
+    },
+    activeJob(){
+      return this.$store.getters.getActiveJob;
+    }
+  },
   data: function() {
     return {
       infoStage: {
         mortWrapName: 'Сведения о работе',
         mortWrapActive: false,
         mortWrapID: 'job',
-        mortWrapJobs: {
-          job1: {
-            jobTitle: 'Основное место работы'
-          }
-        },
         mortWrapInputs: {
           jobType: {
             inputName: 'jobType',
@@ -368,4 +405,65 @@ export default {
 
 <style scoped lang="scss">
 
+  .job-tabs{
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px -10px 20px;
+    &__item{
+      margin: 10px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 17px;
+      text-align: center;
+      color: #333333;
+      justify-content: center;
+      width: calc(25% - 20px);
+      position: relative;
+      height: 60px;
+      background: #FFFFFF;
+      border: 2px solid rgba(51, 51, 51, 0.3);
+      box-sizing: border-box;
+      border-radius: 5px;
+      
+      &:not(:last-child):not(:first-child){
+        .job-tabs__item__close{
+          display: block;
+        }
+      }
+      &__close{
+        display: none;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+        transform-origin: center center;
+        transition: .2s;
+        &:hover{
+          transform: scale(1.5);
+        }
+      }
+      &_active{
+        border-color: #FD7800 !important;
+      }
+      &:last-child{
+        svg{
+          margin-right: 10px;
+        }
+        font-size: 14px;
+        line-height: 17px;
+        font-weight: normal;
+        color: #333333;
+        border: 1px solid rgba(51, 51, 51, 0.3);
+        box-sizing: border-box;
+        transition: .3s;
+        cursor: pointer;
+        &:hover{
+          background-color: rgba(253, 120, 0, 0.05);
+        }
+      }
+    }
+  }
 </style>

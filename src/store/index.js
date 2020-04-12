@@ -59,6 +59,45 @@ export default new Vuex.Store({
         }
       }
       return state.users['user' + activeId].credit.list
+    },
+
+    getJobs(state){
+      let activeId = state.userActiveID;
+      if(!('job' in state.users['user' + activeId])){
+        Vue.set(state.users['user' + activeId], 'job', {
+          count: 1,
+          activeJOB: 0,
+          list: {
+            'job0': {
+              jobID: 0,
+              jobTitle: 'Основное место работы',
+              data: {},
+            } 
+          }
+        })
+      } 
+      return state.users['user' + activeId].job.list;
+    },
+
+    getActiveJob(state){
+      let activeId = state.userActiveID;
+      if (!('job' in state.users['user' + state.userActiveID])){
+        Vue.set(state.users['user' + activeId], 'job', {
+          count: 1,
+          activeJOB: 0,
+          list: {
+            'job0': {
+              jobID: 0,
+              jobTitle: 'Основное место работы',
+              data: {},
+            } 
+          }
+        })
+      }
+      return state.users['user' + state.userActiveID].job.list['job' + state.users['user' + state.userActiveID].job.activeJOB];
+    },
+    getActiveJobId(state){
+      return state.users['user' + state.userActiveID].job.activeJOB
     }
   },
   mutations: {
@@ -98,8 +137,7 @@ export default new Vuex.Store({
     },
 
     saveUserStage(state, obj){
-      if(obj.stageName == 'assets') {
-        
+      if(obj.stageName == 'assets' || obj.stageName =='creditHistory') {
         return false
       }
       this.state.users['user' + this.state.userActiveID][obj.stageName] = obj;
@@ -165,10 +203,7 @@ export default new Vuex.Store({
       this.state.users['user' + obj.userID].credit.list['item' + obj.creditID].inp = obj.inp;
     },
     deleteCredit(state, id){
-      console.log(id);
-      console.log(this.state.users['user' + state.userActiveID].credit.count);
       this.state.users['user' + state.userActiveID].credit.count--;
-      console.log(this.state.users['user' + state.userActiveID].credit.count);
       Vue.delete(this.state.users['user' + state.userActiveID].credit.list, 'item' + id);
 
       for (let i = id; i < state.userActiveID; i++) {
@@ -181,5 +216,55 @@ export default new Vuex.Store({
     },
     //**** CREDIT END ****//
 
+
+
+    addJob(state, obj){
+      let activeId = this.state.userActiveID;
+      Vue.set(this.state.users['user' + activeId].job.list, ('job' + this.state.users['user' + activeId].job.count), obj);
+      let title = this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobTitle;
+      this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobTitle = title + this.state.users['user' + activeId].job.count;
+      this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobID = this.state.users['user' + activeId].job.count;
+      this.state.users['user' + activeId].job.count++;
+    },
+    changeActiveJob(state, id){
+      let activeId = this.state.userActiveID;
+      this.state.users['user' + activeId].job.activeJOB = id;
+    },
+    deleteJob(state, n){
+      let activeId = this.state.userActiveID;
+      let jobs = this.state.users['user' + activeId].job;
+
+      jobs.count--;
+
+
+      if (n == jobs.count) {
+        delete jobs.list['job' + n];
+        jobs.activeJOB = (n - 1);
+        return false;
+      }
+      for (let i = n; i < jobs.count; i++) {
+        jobs.list['job' + i] = jobs.list['job' + (i + 1)];
+        jobs.list['job' + i].jobID = i;
+        jobs.list['job' + i].jobTitle = 'Дополнительное место работы ' + i;
+        delete jobs.list['job' + (i + 1)];
+      }
+      jobs.activeJOB = jobs.count - 1;
+    },
+    saveJobStage(state, obj){
+      this.state.users['user' + this.state.userActiveID].job.list['job' + obj.id].data = {
+        ...obj.fields,
+        ...obj.dopsBlocks,
+      };
+    }
   },
+  actions: {
+    createDopJob(ctx){
+      let dopJob = {
+        jobID: 0,
+        jobTitle: 'Дополнительное место работы ',
+        data: {}
+      }
+      ctx.commit('addJob', dopJob)
+    }
+  }
 })
