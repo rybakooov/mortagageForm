@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <defaultStage :stageInfo="infoStage"/>
-    123
-    {{ this.infoStage.mortWrapInputs.comment }}
-  </div>
+  <defaultStage :stageInfo="infoStage"/>
 </template>
 
 <script>

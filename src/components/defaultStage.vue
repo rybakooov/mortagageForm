@@ -106,6 +106,10 @@ export default {
     },
   },
   mounted: function(){
+    //! Бекап исходного состояния стейджа.
+    /*for()
+    this.backUpStageInfo = JSON.parse(JSON.stringify(this.stageInfo));*/
+    
     this.openedStage = this.$store.state.openedStage;
     this.insertStage();
   },
@@ -113,7 +117,6 @@ export default {
     openPlz() {
 
       /*сохраняем, если закрывается хотя бы один блок */
-      this.saveStage();
       if(this.$store.state.openedStage == this.stageInfo.mortWrapID) {
         this.$store.commit('changeOpenedStage', false);
       } else {
@@ -124,10 +127,6 @@ export default {
     saveStage() {
       let forSave = {};
       forSave.stageName = this.stageInfo.mortWrapID;
-
-      
-
-
 
       forSave.fields = {};
       /* сохраняем данные первого уровня */
@@ -175,7 +174,7 @@ export default {
 
       //**** JOB ****//
       if (this.stageInfo.mortWrapID == 'job'){
-        delete forSave.stageName;
+        //delete forSave.stageName;
         forSave.id = this.$store.getters.getActiveJob.jobID;
         this.$store.commit('saveJobStage', forSave);
         return false
@@ -185,11 +184,17 @@ export default {
 
 
       this.$store.commit('saveUserStage', forSave);
+
+      //console.log('сохранено в такого юзера ' + this.$store.getters.getActiveID);
     },
 
     insertStage() {
-
       if (this.stageInfo.mortWrapID == 'job'){
+        //! Если !dirty то обнулять инпуты до исходного
+        /*if (!this.$store.getters.getActiveJob.dirty) {
+          console.log(this.backUpStageInfo);
+          this.stageInfo = Object.assign({}, this.backUpStageInfo);
+        }*/ 
         for(let field in this.$store.getters.getActiveJob.data.firstInputs){
           this.stageInfo.mortWrapInputs[field].inputValue = this.$store.getters.getActiveJob.data.firstInputs[field];
         }
@@ -205,6 +210,7 @@ export default {
 
 
       let activeUser = this.$store.getters.getActiveUser;
+
       //if(activeUser != undefined){
       let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
       if(stateOfActiveUser){
@@ -238,7 +244,6 @@ export default {
       return this.$store.getters.getActiveID
     },
     changeJobHelper(){
-      if(this.$store.getters.changeJobHelper == undefined) return 0
       return this.$store.getters.getActiveJobId;
     },
     sortList() {
@@ -259,6 +264,13 @@ export default {
     }
   },
   watch: {
+    'isOpen': {
+      handler: function(){
+        if(this.isOpen == false){
+          this.saveStage();
+        } 
+      }
+    },
     'changeUsersHelper': {
       handler: function(){
         this.insertStage();
@@ -274,6 +286,8 @@ export default {
     return {
       showBlocks: false,
       openedStage: '',
+      backUpStageInfo: {},
+      backUpSubs: {},
     }
   },
 }

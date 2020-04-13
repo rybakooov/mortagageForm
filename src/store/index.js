@@ -97,7 +97,12 @@ export default new Vuex.Store({
       return state.users['user' + state.userActiveID].job.list['job' + state.users['user' + state.userActiveID].job.activeJOB];
     },
     getActiveJobId(state){
-      return state.users['user' + state.userActiveID].job.activeJOB
+      if(state.users['user' + state.userActiveID].job == undefined){
+        return 0
+      } else {
+        return state.users['user' + state.userActiveID].job.activeJOB
+      }
+      
     }
   },
   mutations: {
@@ -140,12 +145,24 @@ export default new Vuex.Store({
       if(obj.stageName == 'assets' || obj.stageName =='creditHistory') {
         return false
       }
+      
       this.state.users['user' + this.state.userActiveID][obj.stageName] = obj;
+      this.state.users['user' + this.state.userActiveID][obj.stageName].dirty = true;
     },
 
     changeUser(state, n){
       this.state.openedStage = false;
-      this.state.userActiveID = n;
+        //? При смене юзера, у нас закрывается активный этап. 
+        //? При закрытии этапа в defaultStage вызывается функция сохранения этапа
+
+      setTimeout(() => {
+        this.state.userActiveID = n;
+      }, 100) 
+        //? Если мгновенно(без сеттаймаута) после закрытия этапа менять значение обозначающее id активного юзера
+        //? То функция сохранения, которая сохраняет данные в активного юзера
+        //? Будет ссылаться на уже поменянный id выбранного юзера.
+        //! Костыль 
+        //TODO Эту проблему надо решить
     },
     //**** USER END ****//
 
@@ -255,6 +272,7 @@ export default new Vuex.Store({
         ...obj.fields,
         ...obj.dopsBlocks,
       };
+      this.state.users['user' + this.state.userActiveID].job.list['job' + obj.id].dirty = true;
     }
   },
   actions: {
