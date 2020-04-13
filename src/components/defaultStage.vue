@@ -12,8 +12,7 @@
       <!-- TITLEBLOCK END -->
 
       <!-- PASSPORT AND SIGNATURE -->
-      <div v-if="isOpen && stageInfo.mortWrapSolo" class="mortWrap-block-inside">
-        <slot name="Passport"></slot>
+      <div v-if="isOpen && stageInfo.mortWrapID == 'sign'" class="mortWrap-block-inside">
         <slot name="Signature"></slot>
       </div>
 
@@ -55,8 +54,15 @@
           </p>
           <!-- SUBTITLE SECOND LEVEL END -->
 
+          <!-- files -->
 
-          <div class="mortWrap-block-inside-inputMargin">
+          <div v-if="block.docs == true">
+            <slot name="Passport"></slot>
+          </div>
+
+          <!-- files end -->
+          
+          <div v-if="block.docs != true" class="mortWrap-block-inside-inputMargin">
             <defaultInput :key="inputDown.inputName" v-for="inputDown in block.mortWrapInputs" :inputData="inputDown"/>
 
 
