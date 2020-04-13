@@ -17,7 +17,10 @@
 
     <textarea 
       v-if="inputData.inputType == 'textarea'"
-      class="defaultInput__input defaultInput__input_textarea" 
+      class="defaultInput__input defaultInput__input_textarea"
+      v-model="inputData.inputValue" 
+      :id="inputData.inputName" 
+      :name="inputData.inputName" 
       ></textarea>
     <input 
       v-else
