@@ -112,12 +112,10 @@ export default {
     },
   },
   mounted: function(){
-    //! Бекап исходного состояния стейджа.
-    /*for()
-    this.backUpStageInfo = JSON.parse(JSON.stringify(this.stageInfo));*/
-    
     this.openedStage = this.$store.state.openedStage;
     this.insertStage();
+    this.backUp = JSON.parse(JSON.stringify(this.stageInfo));
+
   },
   methods: {
     openPlz() {
@@ -191,16 +189,38 @@ export default {
 
       this.$store.commit('saveUserStage', forSave);
 
+      
       //console.log('сохранено в такого юзера ' + this.$store.getters.getActiveID);
     },
+    restartStage(){
+      
+      if('mortWrapInputs' in this.backUp){
+        for(let field in this.backUp.mortWrapInputs){
+          this.stageInfo.mortWrapInputs[field].inputValue = this.backUp.mortWrapInputs[field].inputValue;
+        }
+      }
 
+      if('mortWrapDopsBlocks' in this.backUp){
+        for(let block1 in this.backUp.mortWrapDopsBlocks){
+          if ('mortWrapInputs' in this.backUp.mortWrapDopsBlocks){
+            for(let field1 in this.backUp.mortWrapDopsBlocks[block1]){
+              this.stageInfo.mortWrapDopsBlocks[block1].mortWrapInputs[field1].inputValue = this.backUp.mortWrapDopsBlocks[block1].mortWrapInputs[field1].inputValue;
+            }
+          }
+        }
+      }
+
+
+    },
     insertStage() {
+      this.restartStage();
       if (this.stageInfo.mortWrapID == 'job'){
         //! Если !dirty то обнулять инпуты до исходного
         /*if (!this.$store.getters.getActiveJob.dirty) {
-          console.log(this.backUpStageInfo);
-          this.stageInfo = Object.assign({}, this.backUpStageInfo);
-        }*/ 
+          console.log('зашел в не дирти');
+          this.restartStage();
+          return false;
+        }*/
         for(let field in this.$store.getters.getActiveJob.data.firstInputs){
           this.stageInfo.mortWrapInputs[field].inputValue = this.$store.getters.getActiveJob.data.firstInputs[field];
         }
@@ -217,32 +237,32 @@ export default {
 
       let activeUser = this.$store.getters.getActiveUser;
 
-      //if(activeUser != undefined){
-      let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
-      if(stateOfActiveUser){
-        if(stateOfActiveUser.fields != undefined){
-          for(let field in stateOfActiveUser.fields.firstInputs){
-            this.stageInfo.mortWrapInputs[field].inputValue = stateOfActiveUser.fields.firstInputs[field];
-          }
-          if(stateOfActiveUser.fields.subsidies != undefined){
-            for(let sub in stateOfActiveUser.fields.subsidies){
-              this.subs[sub].notDisabled = stateOfActiveUser.fields.subsidies[sub].notDisabled;
+      if(activeUser != undefined){
+        let stateOfActiveUser = activeUser[this.stageInfo.mortWrapID];
+        if(stateOfActiveUser){
+          if(stateOfActiveUser.fields != undefined){
+            for(let field in stateOfActiveUser.fields.firstInputs){
+              this.stageInfo.mortWrapInputs[field].inputValue = stateOfActiveUser.fields.firstInputs[field];
+            }
+            if(stateOfActiveUser.fields.subsidies != undefined){
+              for(let sub in stateOfActiveUser.fields.subsidies){
+                this.subs[sub].notDisabled = stateOfActiveUser.fields.subsidies[sub].notDisabled;
 
-              for(let input in stateOfActiveUser.fields.subsidies[sub].inputs){
-                this.subs[sub].inputs[input].inputValue = stateOfActiveUser.fields.subsidies[sub].inputs[input];
+                for(let input in stateOfActiveUser.fields.subsidies[sub].inputs){
+                  this.subs[sub].inputs[input].inputValue = stateOfActiveUser.fields.subsidies[sub].inputs[input];
+                }
+              }
+            }
+          }
+          if(stateOfActiveUser.dopsBlocks != undefined){
+            for(let block in stateOfActiveUser.dopsBlocks) {
+              for(let field in stateOfActiveUser.dopsBlocks[block].fields){
+                this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = stateOfActiveUser.dopsBlocks[block].fields[field]
               }
             }
           }
         }
-        if(stateOfActiveUser.dopsBlocks != undefined){
-          for(let block in stateOfActiveUser.dopsBlocks) {
-            for(let field in stateOfActiveUser.dopsBlocks[block].fields){
-              this.stageInfo.mortWrapDopsBlocks[block].mortWrapInputs[field].inputValue = stateOfActiveUser.dopsBlocks[block].fields[field]
-            }
-          }
-        }
       }
-      //}
     }
   },
   computed: {
@@ -269,21 +289,24 @@ export default {
       return this.$store.state.openedStage == this.stageInfo.mortWrapID;
     }
   },
+  updated: function(){
+    this.saveStage();
+  },
   watch: {
     'isOpen': {
       handler: function(){
-        if(this.isOpen == false){
-          this.saveStage();
-        } 
+        this.saveStage();
       }
     },
     'changeUsersHelper': {
       handler: function(){
+        //this.restartStage();
         this.insertStage();
       }
     },
     'changeJobHelper': {
       handler: function(){
+        //this.restartStage();
         this.insertStage();
       }
     }
@@ -292,8 +315,7 @@ export default {
     return {
       showBlocks: false,
       openedStage: '',
-      backUpStageInfo: {},
-      backUpSubs: {},
+      backUp: {},
     }
   },
 }

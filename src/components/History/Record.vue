@@ -98,6 +98,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'text',
+          inputValidate: {
+            required: true,
+          },
         },
         creditCurrency: {
           inputName: 'creditCurrency',
@@ -119,6 +122,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'number',
+          inputValidate: {
+            required: true,
+          },
         },
         monthSum: {
           inputName: 'monthSum',
@@ -127,6 +133,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'number',
+          inputValidate: {
+            required: true,
+          },
         },
         remains: {
           inputName: 'remains',
@@ -135,6 +144,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'number',
+          inputValidate: {
+            required: true,
+          },
         },
         term: {
           inputName: 'term',
@@ -143,6 +155,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'number',
+          inputValidate: {
+            required: true,
+          },
         },
       },
       activeId: this.$store.getters.getActiveID,

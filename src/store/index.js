@@ -14,7 +14,7 @@ export default new Vuex.Store({
     usersCount: 1,
     users: {
       user0: {
-        name: 'Инокентий Витькович',
+        name: 'Новый пользователь 0',
         status: 'Заемщик',
         id: 0,
       }
@@ -103,9 +103,18 @@ export default new Vuex.Store({
         return state.users['user' + state.userActiveID].job.activeJOB
       }
       
-    }
+    },
+
   },
   mutations: {
+    changeUserName(state, string){
+      let activeId = this.state.userActiveID;
+      if(string == '  '){
+        this.state.users['user' + activeId].name = 'Новый пользователь ' + activeId;
+      } else {
+        this.state.users['user' + activeId].name = string;
+      }
+    },
     changeOpenedStage(state, n) {
       this.state.openedStage = n;
     },
@@ -136,6 +145,10 @@ export default new Vuex.Store({
       for (let i = obj; i < this.state.usersCount; i++) {
         this.state.users['user' + i] = this.state.users['user' + (i + 1)];
         this.state.users['user' + i].id = i;
+        if(!this.state.users['user' + i].name.indexOf('Новый пользователь') == -1){
+          this.state.users['user' + i].name = 'Новый пользователь ' +  i;
+        }
+        
         delete this.state.users['user' + (i + 1)];
       }
       this.state.userActiveID = this.state.usersCount - 1;
@@ -157,7 +170,7 @@ export default new Vuex.Store({
 
       setTimeout(() => {
         this.state.userActiveID = n;
-      }, 100) 
+      }, 200) 
         //? Если мгновенно(без сеттаймаута) после закрытия этапа менять значение обозначающее id активного юзера
         //? То функция сохранения, которая сохраняет данные в активного юзера
         //? Будет ссылаться на уже поменянный id выбранного юзера.

@@ -11,8 +11,11 @@ export default {
   components: {
     defaultStage
   },
-  methods: {
-
+  computed: {
+    FIO(){
+      let inps = this.infoStage.mortWrapInputs;
+      return inps.userSecondName.inputValue + ' ' + inps.userFirstName.inputValue + ' ' + inps.userPatronymicName.inputValue;
+    },
   },
   watch: {
     'infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.registrationIsFactResidence.inputValue': {
@@ -23,7 +26,66 @@ export default {
           this.infoStage.mortWrapDopsBlocks.userFactResidence.visible = true;
         }
       }
-    }
+    },
+
+    //**** Имя в табы ****//
+    'infoStage.mortWrapInputs.userSecondName.inputValue': {
+      handler: function(){
+        this.$store.commit('changeUserName', this.FIO);
+      }
+    },
+    'infoStage.mortWrapInputs.userFirstName.inputValue': {
+      handler: function(){
+        this.$store.commit('changeUserName', this.FIO);
+      }
+    },
+    'infoStage.mortWrapInputs.userPatronymicName.inputValue': {
+      handler: function(){
+        this.$store.commit('changeUserName', this.FIO);
+      }
+    },
+    //**** Имя в табы конец ****//
+
+
+
+    //**** KLADR ****//
+
+    'infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.areaHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.cityHouse.kladr.regionId = this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.areaHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.cityHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.streetHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.cityHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.streetHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.numHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.userRegistration.mortWrapInputs.streetHouse.kladrData.id
+      }
+    },
+
+    'infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.areaHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.cityHouse.kladr.regionId = this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.areaHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.cityHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.streetHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.cityHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.streetHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.numHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.userFactResidence.mortWrapInputs.streetHouse.kladrData.id
+      }
+    },
+
+    //**** KLADR ****//
+
+
+
   },
   data: function() {
     return {
@@ -51,6 +113,8 @@ export default {
             inputWidth: 'oneThird',
             inputType: 'text',
             inputValidate: {
+              required: true,
+              minLength: 2,
             }
           },
           userPatronymicName: {
@@ -61,6 +125,8 @@ export default {
             inputWidth: 'oneThird',
             inputType: 'text',
             inputValidate: {
+              required: true,
+              minLength: 2,
             }
           },
           userPlaceOfBirth: {
@@ -71,6 +137,8 @@ export default {
             inputWidth: 'oneThird',
             inputType: 'text',
             inputValidate: {
+              required: true,
+              minLength: 2,
             }
           },
           userDateOfBirth: {
@@ -82,6 +150,8 @@ export default {
             inputType: 'date',
             mask: mask.date,
             inputValidate: {
+              required: true,
+              minLength: 10,
             }
           },
           userSex: {
@@ -109,7 +179,9 @@ export default {
                 inputType: 'text',
                 inputPos: 'solo',
                 inputValidate: {
-                }
+                  required: true,
+                  minLength: 2,
+                },
               },
               series: {
                 inputName: 'series',
@@ -120,6 +192,8 @@ export default {
                 inputType: 'number',
                 mask: mask.passSeria,
                 inputValidate: {
+                  required: true,
+                  minLength: 4,
                 }
               },
               number: {
@@ -131,6 +205,8 @@ export default {
                 inputType: 'number',
                 mask: mask.passNumber,
                 inputValidate: {
+                  required: true,
+                  minLength: 6,
                 }
               },
               divisionСode: {
@@ -142,6 +218,8 @@ export default {
                 inputType: 'number',
                 mask: mask.passCode,
                 inputValidate: {
+                  required: true,
+                  minLength: 7,
                 }
               },
               dateOfIssue: {
@@ -153,6 +231,8 @@ export default {
                 inputType: 'date',
                 mask: mask.date,
                 inputValidate: {
+                  required: true,
+                  minLength: 10,
                 }
               },
               whoIssued: {
@@ -162,6 +242,10 @@ export default {
                 inputValue: '',
                 inputWidth: 'half',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                }
               },
               INN: {
                 inputName: 'INN',
@@ -172,6 +256,8 @@ export default {
                 inputType: 'number',
                 mask: mask.inn,
                 inputValidate: {
+                  required: true,
+                  minLength: 12,
                 }
               },
               snils: {
@@ -183,6 +269,8 @@ export default {
                 inputType: 'number',
                 mask: mask.snils,
                 inputValidate: {
+                  required: true,
+                  minLength: 14,
                 }
               },
             },
@@ -288,6 +376,10 @@ export default {
                 inputWidth: 'quarter',
                 inputType: 'number',
                 mask: mask.index,
+                inputValidate: {
+                  required: true,
+                  minLength: 6,
+                },
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -297,6 +389,12 @@ export default {
                 inputWidth: 'quarter-2',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  contentType: 'region'
                 }
               },
               cityHouse: {
@@ -307,6 +405,13 @@ export default {
                 inputWidth: 'quarter-2',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  regionId: '',
+                  contentType: 'city'
                 }
               },
               streetHouse: {
@@ -317,6 +422,13 @@ export default {
                 inputWidth: 'half',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  cityId: '',
+                  contentType: 'street'
                 }
               },
               numHouse: {
@@ -327,6 +439,12 @@ export default {
                 inputWidth: 'one-6',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                },
+                kladrData: {},
+                kladr: {
+                  streetId: '',
+                  contentType: 'building'
                 }
               },
               corpusHouse: {
@@ -381,6 +499,10 @@ export default {
                 inputWidth: 'quarter',
                 inputType: 'number',
                 mask: mask.index,
+                inputValidate: {
+                  required: true,
+                  minLength: 6,
+                },
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -390,6 +512,12 @@ export default {
                 inputWidth: 'quarter-2',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  contentType: 'region'
                 }
               },
               cityHouse: {
@@ -400,6 +528,13 @@ export default {
                 inputWidth: 'quarter-2',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  regionId: '',
+                  contentType: 'city'
                 }
               },
               streetHouse: {
@@ -410,6 +545,13 @@ export default {
                 inputWidth: 'half',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  cityId: '',
+                  contentType: 'street'
                 }
               },
               numHouse: {
@@ -420,6 +562,12 @@ export default {
                 inputWidth: 'one-6',
                 inputType: 'text',
                 inputValidate: {
+                  required: true,
+                },
+                kladrData: {},
+                kladr: {
+                  streetId: '',
+                  contentType: 'building'
                 }
               },
               corpusHouse: {

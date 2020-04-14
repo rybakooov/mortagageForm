@@ -41,7 +41,9 @@ export default {
     },
     deleteUser(id){
       this.$store.commit('deleteUser', id)
-    }
+    },
+
+
   },
   computed: {
     users(){
@@ -50,7 +52,7 @@ export default {
     activeUser(){
       return this.$store.state.userActiveID;
     }
-  }
+  },
 }
 </script>
 

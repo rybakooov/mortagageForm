@@ -126,6 +126,9 @@ export default {
           inputValue: '',
           inputWidth: 'half',
           inputType: 'text',
+          inputValidate: {
+            required: true,
+          },
         },
         typeOfProperty: {
           inputName: 'typeOfProperty',
@@ -146,6 +149,9 @@ export default {
           inputValue: '',
           inputWidth: 'one-6',
           inputType: 'text',
+          inputValidate: {
+            required: true,
+          },
         }
       },
       assetCar: {
@@ -156,6 +162,9 @@ export default {
           inputValue: '',
           inputWidth: 'half',
           inputType: 'text',
+          inputValidate: {
+            required: true,
+          },
         },
         carYear: {
           inputName: 'carYear',
@@ -164,6 +173,9 @@ export default {
           inputValue: '',
           inputWidth: 'oneThird',
           inputType: 'text',
+          inputValidate: {
+            required: true,
+          },
         }
       },
       activeId: this.$store.getters.getActiveID,

@@ -15,15 +15,57 @@ export default {
     'infoStage.mortWrapInputs.housePrice.inputValue': {
       handler: function (newVal) {
         this.infoStage.mortWrapInputs.creditSum.inputValidate.maxVal = newVal;
-        // ************************ МАКСИМЛЬНАЯ СУБСИДИЯ *****************************//
-        //this.maxSubs = this.infoStage.mortWrapInputs.creditSum
       }
     },
     'infoStage.mortWrapInputs.creditSum.inputValue': {
       handler: function (newVal) {
         this.infoStage.mortWrapInputs.firstPayment.inputValidate.maxVal = newVal;
         // ************************ МАКСИМЛЬНАЯ СУБСИДИЯ *****************************//
-        //this.maxSubs = 
+        var creditSum = 0;
+        var firstPayment = 0;
+        if(newVal != ''){
+          creditSum = parseInt(newVal);
+        }
+        if(this.infoStage.mortWrapInputs.firstPayment.inputValue != ''){
+          firstPayment = parseInt(this.infoStage.mortWrapInputs.firstPayment.inputValue);
+        }
+        let maxSubs = creditSum - firstPayment;
+        if(maxSubs < 0){
+          maxSubs = 0
+        }
+        
+        if (maxSubs > 616617){
+          this.subsidies.maternalSub.inputs.maternalSum.inputValidate.maxVal = 616617;
+        } else {
+          this.subsidies.maternalSub.inputs.maternalSum.inputValidate.maxVal = maxSubs;
+        }
+        this.subsidies.simplySub.inputs.simplySum.inputValidate.maxVal = maxSubs;
+        this.subsidies.militarySub.inputs.militarySum.inputValidate.maxVal = maxSubs;
+      }
+    },
+    'infoStage.mortWrapInputs.firstPayment.inputValue': {
+      handler: function (newVal) {
+        // ************************ МАКСИМЛЬНАЯ СУБСИДИЯ *****************************//
+        var creditSum = 0;
+        var firstPayment = 0;
+        if(this.infoStage.mortWrapInputs.creditSum.inputValue != ''){
+          creditSum = parseInt(this.infoStage.mortWrapInputs.creditSum.inputValue);
+        }
+        if(newVal != ''){
+          firstPayment = parseInt(newVal);
+        }
+        let maxSubs = creditSum - firstPayment;
+        if(maxSubs < 0){
+          maxSubs = 0
+        }
+        
+        if (maxSubs > 616617){
+          this.subsidies.maternalSub.inputs.maternalSum.inputValidate.maxVal = 616617;
+        } else {
+          this.subsidies.maternalSub.inputs.maternalSum.inputValidate.maxVal = maxSubs;
+        }
+        this.subsidies.simplySub.inputs.simplySum.inputValidate.maxVal = maxSubs;
+        this.subsidies.militarySub.inputs.militarySum.inputValidate.maxVal = maxSubs;
         
       }
     }
@@ -36,6 +78,7 @@ export default {
       infoStage: {
         mortWrapName: 'Условия кредитования',
         mortWrapID: 'condition',
+        maxSubs: 0,
         mortWrapInputs: {
           creditPurpose: {
             inputName: 'creditPurpose',
@@ -138,6 +181,7 @@ export default {
               postfix: ' Руб',
               inputValidate: {
                 required: true,
+                maxVal: 0
               }
             },
             howToUse: {
@@ -162,6 +206,7 @@ export default {
               postfix: ' %',
               inputValidate: {
                 required: true,
+                maxVal: 0
               }
             },
           }
@@ -183,6 +228,7 @@ export default {
               postfix: ' Руб',
               inputValidate: {
                 required: true,
+                maxVal: 0
               }
             },
             subsidyType: {
@@ -221,6 +267,7 @@ export default {
               hint: 'НИС - накопительная ипотечная система',
               inputValidate: {
                 required: true,
+                maxVal: 0
               }
             },
             militaryDate: {

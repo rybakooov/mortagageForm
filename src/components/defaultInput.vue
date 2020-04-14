@@ -36,14 +36,19 @@
       
       @input="messageError"
       ref="input"
-      :class="{'error-inp': (('inputValidate' in this.inputData) && this.changed && this.$v.inputData.inputValue.$invalid)}"
+      :class="{'error-inp': (('inputValidate' in this.inputData) && this.changed && this.$v.inputData.inputValue.$invalid && !this.disabled)}"
     >
+    <div class="kladr-hint" v-if="this.kladrHint.length > 0"> 
+      <p class="kladr-hint__item" @click="addKladr(item)" v-for="item in this.kladrHint" :key="item.id">
+        {{ item.name }}
+      </p>
+    </div>
 
     <p class="postfix" v-if="inputData.postfix">
       {{ inputData.postfix }}
     </p>
     <!-- ERROR MESSAGE -->
-    <p v-if="this.error != '' && this.changed && this.$v.inputData.inputValue.$invalid" class="error-message">
+    <p v-if="this.error != '' && this.changed && this.$v.inputData.inputValue.$invalid && !this.disabled" class="error-message">
       {{ error }}
     </p>
     
@@ -93,7 +98,7 @@
 
 import ClickOutside from 'vue-click-outside'
 import {IMaskDirective} from 'vue-imask';
-import Postfix from '@/Directives/Postfix';
+import kladr from '@/JSModules/kladr.js';
 import { required, maxValue, maxLength, minLength } from 'vuelidate/lib/validators'
 
 
@@ -109,6 +114,8 @@ export default {
       newInputData: this.inputData,
       error: '',
       changed: false,
+      kladrHint: [],
+      completeKladr: false,
     }
   },
   mounted: function () {
@@ -150,21 +157,49 @@ export default {
       this.inputData.inputValue = option;
       this.inputData.inputSelectCond = !this.inputData.inputSelectCond;
     },
+    addKladr(item){
+      this.inputData.inputValue = item.name + ' ' + item.typeShort;
+      this.inputData.kladrData = {
+        id: item.id,
+        guid: item.guid
+      }
+      this.completeKladr = true;
+    }
     /*updateMask() {
       this.$refs.input.maskRef.updateValue();
     }*/
   },
   watch: {
-    /*'inputData.inputValue': {
-      handler: function () {
-
+    'inputData.inputValue': {
+      handler: function (newVal) {
+        this.completeKladr = false;
+        this.kladrData = {};
+        if('kladr' in this.inputData && newVal.length > 1){
+          let newKladr = {
+            ...this.inputData.kladr,
+            query: newVal,
+          }
+          var resp;
+          kladr(newKladr, (e) =>{
+            resp = e;
+            let newArr = [];
+            for(let i = 1; i < resp.result.length; i++){
+              newArr.push(resp.result[i]);
+            }
+            this.kladrHint = [
+              ...newArr
+            ]
+          });
+        }
       }
-    },*/
+    },
+  },
+  computed: {
+
   },
   directives: {
     ClickOutside,
     imask: IMaskDirective,
-    postfix: Postfix,
   },
   
   validations() {
@@ -253,6 +288,11 @@ export default {
     }
     &__input:focus{
       border-color: #FD7800;
+    }
+    &__input:hover, &__input:focus{
+      & + .kladr-hint{
+        display: block;
+      }
     }
     &__input, &__select{
       height: 50px;
@@ -392,5 +432,37 @@ export default {
   }
   .error-inp{
     border-color: #FD0000 !important;
+  }
+
+
+  .kladr-hint{
+    position: absolute;
+    top: 100%;
+    display: none;
+    z-index: 5;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+    &:hover{
+      display: block;
+    }
+    &__item{
+      padding: 0 16px;
+      height: 50px;
+      color: #333333;
+      font-size: 14px;
+      line-height: 17px;
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+      transition: .3s;
+      &:not(:last-child){
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      &:hover{
+        color: #FD7800;
+      }
+    }
   }
 </style>

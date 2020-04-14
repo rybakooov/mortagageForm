@@ -34,6 +34,9 @@ export default {
   components: {
     defaultStage
   },
+  mounted: function(){
+
+  },
   methods: {
     addJob(){
       this.$store.dispatch('createDopJob');
@@ -54,7 +57,50 @@ export default {
           this.infoStage.mortWrapDopsBlocks.factAdress.visible = true;
         }
       }
-    }
+    },
+
+
+
+
+    //**** KLADR ****//
+
+    'infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.areaHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.cityHouse.kladr.regionId = this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.areaHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.cityHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.streetHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.cityHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.streetHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.numHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.urAdress.mortWrapInputs.streetHouse.kladrData.id
+      }
+    },
+
+    'infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.areaHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.cityHouse.kladr.regionId = this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.areaHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.cityHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.streetHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.cityHouse.kladrData.id
+      }
+    },
+    'infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.streetHouse.kladrData': {
+      handler: function(){
+        this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.numHouse.kladr.cityId = this.infoStage.mortWrapDopsBlocks.factAdress.mortWrapInputs.streetHouse.kladrData.id
+      }
+    },
+
+    //**** KLADR ****//
+
+
+
+
   },
   computed: {
     getAc(){
@@ -96,6 +142,10 @@ export default {
             inputValue: '',
             inputWidth: 'quarter',
             inputType: 'text',
+            inputValidate: {
+              required: true,
+              minLength: 2,
+            },
           },
           INN: {
             inputName: 'INN',
@@ -105,6 +155,10 @@ export default {
             inputWidth: 'quarter',
             inputType: 'number',
             mask: mask.inn,
+            inputValidate: {
+              required: true,
+              minLength: 12,
+            },
           },
           phone: {
             inputName: 'phone',
@@ -114,6 +168,10 @@ export default {
             mask: mask.phone,
             inputWidth: 'quarter',
             inputType: 'phone',
+            inputValidate: {
+              required: true,
+              minLength: 18,
+            },
           },
           site: {
             inputName: 'site',
@@ -122,6 +180,10 @@ export default {
             inputValue: '',
             inputWidth: 'quarter',
             inputType: 'text',
+            inputValidate: {
+              required: true,
+              minLength: 2,
+            },
           },
         },
         mortWrapDopsBlocks: {
@@ -141,14 +203,19 @@ export default {
                   'Да',
                 ]
               },
+              /* copy down */
               indexHouse: {
                 inputName: 'indexHouse',
                 inputTitle: 'Индекс',
                 inputPlaceholder: '197198',
                 inputValue: '',
-                mask: mask.index,
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.index,
+                inputValidate: {
+                  required: true,
+                  minLength: 6,
+                },
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -157,6 +224,14 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  contentType: 'region'
+                }
               },
               cityHouse: {
                 inputName: 'cityHouse',
@@ -165,6 +240,15 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  regionId: '',
+                  contentType: 'city'
+                }
               },
               streetHouse: {
                 inputName: 'streetHouse',
@@ -173,6 +257,15 @@ export default {
                 inputValue: '',
                 inputWidth: 'half',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  cityId: '',
+                  contentType: 'street'
+                }
               },
               numHouse: {
                 inputName: 'numHouse',
@@ -181,6 +274,14 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                },
+                kladrData: {},
+                kladr: {
+                  streetId: '',
+                  contentType: 'building'
+                }
               },
               corpusHouse: {
                 inputName: 'corpusHouse',
@@ -197,21 +298,30 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
+              
+              /* copy down end */
             }
           },
           factAdress: {
             subTitle: 'Фактический адрес адрес',
             visible: true,
             mortWrapInputs: {
+              /* copy down */
               indexHouse: {
                 inputName: 'indexHouse',
                 inputTitle: 'Индекс',
                 inputPlaceholder: '197198',
                 inputValue: '',
-                mask: mask.index,
                 inputWidth: 'quarter',
                 inputType: 'number',
+                mask: mask.index,
+                inputValidate: {
+                  required: true,
+                  minLength: 6,
+                },
               },
               areaHouse: {
                 inputName: 'areaHouse',
@@ -220,6 +330,14 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  contentType: 'region'
+                }
               },
               cityHouse: {
                 inputName: 'cityHouse',
@@ -228,6 +346,15 @@ export default {
                 inputValue: '',
                 inputWidth: 'quarter-2',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  regionId: '',
+                  contentType: 'city'
+                }
               },
               streetHouse: {
                 inputName: 'streetHouse',
@@ -236,6 +363,15 @@ export default {
                 inputValue: '',
                 inputWidth: 'half',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                  minLength: 2,
+                },
+                kladrData: {},
+                kladr: {
+                  cityId: '',
+                  contentType: 'street'
+                }
               },
               numHouse: {
                 inputName: 'numHouse',
@@ -244,6 +380,14 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                },
+                kladrData: {},
+                kladr: {
+                  streetId: '',
+                  contentType: 'building'
+                }
               },
               corpusHouse: {
                 inputName: 'corpusHouse',
@@ -260,7 +404,11 @@ export default {
                 inputValue: '',
                 inputWidth: 'one-6',
                 inputType: 'text',
+                inputValidate: {
+                }
               },
+              
+              /* copy down end */
             }
           },
           aboutJob: {
@@ -333,6 +481,9 @@ export default {
                 inputWidth: 'oneThird',
                 inputPlaceholder: '2',
                 inputType: 'text',
+                inputValidate: {
+                  required: true,
+                },
               },
               withoutConfirm: {
                 inputName: 'withoutConfirm',
@@ -356,6 +507,9 @@ export default {
                 inputType: 'number',
                 postfix: ' Руб',
                 mask: mask.rub,
+                inputValidate: {
+                  required: true,
+                },
               },
             },
             checkboxBlock: {
@@ -395,7 +549,7 @@ export default {
             }
           }
         },
-      }
+      },
     }
   }
 }
