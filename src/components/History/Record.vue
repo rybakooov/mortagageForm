@@ -105,7 +105,7 @@ export default {
         creditCurrency: {
           inputName: 'creditCurrency',
           inputTitle: 'Вид кредита',
-          inputValue: '$ Доллары США',
+          inputValue: 'Р Рубли РФ',
           inputWidth: 'oneThird',
           inputType: 'select',
           inputSelectCond: false,

@@ -9,7 +9,7 @@
         @click="changeActiveJob(job.jobID)"
         :class="{'job-tabs__item_active': (job.jobID == activeJob.jobID)}"
         >
-          {{job.jobTitle}}
+          {{ job.jobTitle }}
           <svg @click.stop="deleteJob(job.jobID)" class="job-tabs__item__close" width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8.07107 1L4.53553 4.53553M4.53553 4.53553L1 8.07107M4.53553 4.53553L8.07107 8.07107M4.53553 4.53553L1 1" stroke="#EB5757" stroke-linecap="round"/>
           </svg>
@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     addJob(){
-      this.$store.dispatch('createDopJob');
+      this.$store.commit('addJob');
     },
     changeActiveJob(n){
       this.$store.commit('changeActiveJob', n);
@@ -103,15 +103,12 @@ export default {
 
   },
   computed: {
-    getAc(){
-      return this.$store.getters.getActiveJob;
-    },
     getJobs(){
       return this.$store.getters.getJobs
     },
     activeJob(){
       return this.$store.getters.getActiveJob;
-    }
+    },
   },
   data: function() {
     return {
@@ -512,20 +509,120 @@ export default {
                 },
               },
             },
-            checkboxBlock: {
+            
+            checkboxBlockSalary: {
               title: 'Сбербанк',
               chekboxs: {
                 salary: {
                   checkTitle: 'salary',
                   checkValue: 'Получаю заработную плату на карту Сбербанка'
                 },
+              }
+            },
+            inputSalary: {
+              inputName: 'inputSalary',
+              inputTitle: 'Источник дохода',
+              inputPlaceholder: 'Пенсия',
+              inputValue: '',
+              inputWidth: '2-3',
+              inputType: 'text',
+            },
+            checkboxBlockPension: {
+              title: '',
+              chekboxs: {
                 pension: {
                   checkTitle: 'pension',
                   checkValue: 'Получаю пенсию на карту Сбербанка'
                 }
               }
+            },
+
+          },
+
+          dopJobs: {
+            
+            subTitle: 'Работа по совместительству',
+
+            mortWrapInputs:{
+              jobTitle: {
+                inputName: 'jobTitle',
+                inputTitle: 'Наименование работодателя',
+                inputPlaceholder: 'ОАО Газпром',
+                inputValue: '',
+                inputWidth: 'oneThird',
+                inputType: 'text',
+              },
+              dolzhn: {
+                inputName: 'dolzhn',
+                inputTitle: 'Должность',
+                inputPlaceholder: 'Директор',
+                inputValue: '',
+                inputWidth: 'oneThird',
+                inputType: 'text',
+              },
+              INN: {
+                inputName: 'INN',
+                inputTitle: 'ИНН',
+                inputPlaceholder: '123456789012',
+                inputValue: '',
+                inputWidth: 'oneThird',
+                inputType: 'number',
+                mask: mask.inn,
+                inputValidate: {
+                  required: true,
+                  minLength: 12,
+                },
+              },
+              address: {
+                inputName: 'address',
+                inputTitle: 'Фактический адрес',
+                inputPlaceholder: 'Россия г.Москва ул.Ленина д.21',
+                inputValue: '',
+                inputWidth: 'oneThird',
+                inputType: 'text',
+              },
+              sphere: {
+                inputName: 'sphere',
+                inputTitle: 'Сфера деятельности организации',
+                inputValue: 'Финансы / Банки / Страхование',
+                inputWidth: 'oneThird',
+                inputType: 'select',
+                inputSelectCond: false,
+                inputSelectOptions: [
+                  'Финансы / Банки / Страхование',
+                  'Правоохранительные органы',
+                  'Образование',
+                  'Сельское хозяйство',
+                  'Культура и искусство',
+                  'Охранная деятельность',
+                  'Органы власти и управления',
+                  'Информационные технологии',
+                  'Оптовая и розничная торговля',
+                  'Медицина',
+                  'Производство',
+                  'Транспорт',
+                  'Промышленность',
+                  'Юриспруденция',
+                  'Строительство',
+                  'Наука',
+                  'Услуги',
+                  'Туризм',
+                  'Иное',
+                ]
+              },
+              income: {
+                inputName: 'income',
+                inputTitle: 'Доход по совместительству',
+                inputPlaceholder: '0 Руб',
+                inputValue: '',
+                inputWidth: 'oneThird',
+                inputType: 'number',
+                postfix: ' Руб',
+                mask: mask.rub,
+              },
             }
           },
+
           dopIncome: {
             mortWrapInputs: {
               dopIncome: {
@@ -582,7 +679,7 @@ export default {
       box-sizing: border-box;
       border-radius: 5px;
       
-      &:not(:last-child):not(:first-child){
+      &:not(:last-child){
         .job-tabs__item__close{
           display: block;
         }

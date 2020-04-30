@@ -20,7 +20,10 @@ export default new Vuex.Store({
       }
     }
   },
-  getters: {
+  getters: {    
+    
+    //**** USER ****//
+
     getActiveUser(state){
       return state.users['user' + state.userActiveID];
     },
@@ -32,8 +35,11 @@ export default new Vuex.Store({
     },
     getUsersCount(state){
       return state.usersCount
-    },
+    },    
+    //**** USER END ****//
 
+
+    //**** ASSETS ****//
     getAssetsList(state){
       let activeId = state.userActiveID;
 
@@ -60,42 +66,44 @@ export default new Vuex.Store({
       }
       return state.users['user' + activeId].credit.list
     },
+    //**** ASSETS END ****//
 
+
+    
+    //**** JOB ****//
     getJobs(state){
       let activeId = state.userActiveID;
       if(!('job' in state.users['user' + activeId])){
         Vue.set(state.users['user' + activeId], 'job', {
-          count: 1,
-          activeJOB: 0,
           list: {
-            'job0': {
-              jobID: 0,
+            'mainJob': {
               jobTitle: 'Основное место работы',
               data: {},
-            } 
+              dopBlockData: {},
+            },
+            dopActiveJob: -1,
+            dopCountJob: 0,
+            dopJobs: [],
           }
         })
       } 
-      return state.users['user' + activeId].job.list;
+      return state.users['user' + activeId].job.list.dopJobs;
     },
-
     getActiveJob(state){
       let activeId = state.userActiveID;
-      if (!('job' in state.users['user' + state.userActiveID])){
-        Vue.set(state.users['user' + activeId], 'job', {
-          count: 1,
-          activeJOB: 0,
-          list: {
-            'job0': {
-              jobID: 0,
-              jobTitle: 'Основное место работы',
-              data: {},
-            } 
+      if('job' in state.users['user' + activeId]){
+        if('list' in state.users['user' + activeId].job){
+
+          for(let dopJob in state.users['user' + activeId].job.list.dopJobs){
+            if(state.users['user' + activeId].job.list.dopJobs[dopJob].jobID == state.users['user' + activeId].job.list.dopActiveJob){
+              return state.users['user' + activeId].job.list.dopJobs[dopJob];
+            }
           }
-        })
+        }
       }
-      return state.users['user' + state.userActiveID].job.list['job' + state.users['user' + state.userActiveID].job.activeJOB];
+      return -1;
     },
+    /*
     getActiveJobId(state){
       if(state.users['user' + state.userActiveID].job == undefined){
         return 0
@@ -103,8 +111,8 @@ export default new Vuex.Store({
         return state.users['user' + state.userActiveID].job.activeJOB
       }
       
-    },
-
+    },*/
+    //**** JOB END ****//
   },
   mutations: {
     changeUserName(state, string){
@@ -229,9 +237,11 @@ export default new Vuex.Store({
       }
       this.state.users['user' + activeId].credit.count++;
     },
+
     saveCredit(state, obj){
       this.state.users['user' + obj.userID].credit.list['item' + obj.creditID].inp = obj.inp;
     },
+
     deleteCredit(state, id){
       this.state.users['user' + state.userActiveID].credit.count--;
       Vue.delete(this.state.users['user' + state.userActiveID].credit.list, 'item' + id);
@@ -248,54 +258,63 @@ export default new Vuex.Store({
 
 
 
-    addJob(state, obj){
-      let activeId = this.state.userActiveID;
-      Vue.set(this.state.users['user' + activeId].job.list, ('job' + this.state.users['user' + activeId].job.count), obj);
-      let title = this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobTitle;
-      this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobTitle = title + this.state.users['user' + activeId].job.count;
-      this.state.users['user' + activeId].job.list['job' + this.state.users['user' + activeId].job.count].jobID = this.state.users['user' + activeId].job.count;
-      this.state.users['user' + activeId].job.count++;
+    //**** JOB ****//
+
+
+    saveDopJob(state, obj){
+      if('job' in this.state.users['user' + this.state.userActiveID]){
+        this.state.users['user' + this.state.userActiveID].job.list.mainJob.data = obj.fields.firstInputs;
+        if(this.state.users['user' + this.state.userActiveID].job.list.dopActiveJob == -1){
+          return false
+        }
+        for(let block in obj.dopsBlocks){
+          if(block == 'dopJobs'){
+            if('dopJobs' in this.state.users['user' + this.state.userActiveID].job.list){
+              this.state.users['user' + this.state.userActiveID].job.list.dopJobs[this.state.users['user' + this.state.userActiveID].job.list.dopActiveJob].data = obj.dopsBlocks.dopJobs.fields
+              /*Vue.set(this.state.users['user' + this.state.userActiveID].job.list.dopJobs[this.state.users['user' + this.state.userActiveID].job.list.dopActiveJob], 'data', {
+                ...obj.dopsBlocks.dopJobs.fields
+              })*/
+            }
+          } else {
+            if('dopBlockData' in this.state.users['user' + this.state.userActiveID].job.list.mainJob){
+              Vue.set(this.state.users['user' + this.state.userActiveID].job.list.mainJob.dopBlockData, block, {
+                ...obj.dopsBlocks[block].fields
+              })
+            }
+          }
+        }
+      }
+      
     },
-    changeActiveJob(state, id){
+
+    addJob(){
       let activeId = this.state.userActiveID;
-      this.state.users['user' + activeId].job.activeJOB = id;
+
+
+      this.state.users['user' + activeId].job.list.dopJobs.push({
+        jobTitle: 'Дополнительное место работы ' + this.state.users['user' + activeId].job.list.dopCountJob,
+        jobID: this.state.users['user' + activeId].job.list.dopCountJob,
+        data: {},
+      })
+      if(this.state.users['user' + activeId].job.list.dopActiveJob == -1){
+        this.state.users['user' + activeId].job.list.dopActiveJob++;
+      }
+      this.state.users['user' + activeId].job.list.dopCountJob++;
+    },
+    changeActiveJob(state, n){
+      let activeId = this.state.userActiveID;
+      this.state.users['user' + activeId].job.list.dopActiveJob = n;
     },
     deleteJob(state, n){
       let activeId = this.state.userActiveID;
-      let jobs = this.state.users['user' + activeId].job;
-
-      jobs.count--;
-
-
-      if (n == jobs.count) {
-        delete jobs.list['job' + n];
-        jobs.activeJOB = (n - 1);
-        return false;
+      this.state.users['user' + activeId].job.list.dopJobs.splice(n, 1);
+      for(let i = n; i < this.state.users['user' + activeId].job.list.dopJobs.length; i++){
+        this.state.users['user' + activeId].job.list.dopJobs[i].jobTitle = 'Дополнительное место работы ' + i;
+        this.state.users['user' + activeId].job.list.dopJobs[i].jobID = i;
       }
-      for (let i = n; i < jobs.count; i++) {
-        jobs.list['job' + i] = jobs.list['job' + (i + 1)];
-        jobs.list['job' + i].jobID = i;
-        jobs.list['job' + i].jobTitle = 'Дополнительное место работы ' + i;
-        delete jobs.list['job' + (i + 1)];
-      }
-      jobs.activeJOB = jobs.count - 1;
+      this.state.users['user' + activeId].job.list.dopActiveJob--;
+      this.state.users['user' + activeId].job.list.dopCountJob--;
     },
-    saveJobStage(state, obj){
-      this.state.users['user' + this.state.userActiveID].job.list['job' + obj.id].data = {
-        ...obj.fields,
-        ...obj.dopsBlocks,
-      };
-      this.state.users['user' + this.state.userActiveID].job.list['job' + obj.id].dirty = true;
-    }
+    //**** JOB END ****//
   },
-  actions: {
-    createDopJob(ctx){
-      let dopJob = {
-        jobID: 0,
-        jobTitle: 'Дополнительное место работы ',
-        data: {}
-      }
-      ctx.commit('addJob', dopJob)
-    }
-  }
 })
